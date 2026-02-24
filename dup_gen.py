@@ -1,7 +1,6 @@
 import geopandas as gpd
 import pandas as pd
 import sqlite3
-from pathlib import Path
 
 
 def duplicate_pointlayer_for_duplicate_tablelayer(
@@ -72,11 +71,6 @@ def duplicate_pointlayer_for_duplicate_tablelayer(
     else:
         point_out = point_gdf
 
-    # Remove destination if it exists (optional, to start clean)
-    dst = Path(dst_gpkg_path)
-    if dst.exists():
-        dst.unlink()
-
     # 1) Write spatial point layer with GeoPandas
     point_out.to_file(dst_gpkg_path, layer=pointlayer, driver="GPKG")
 
@@ -110,10 +104,13 @@ def duplicate_pointlayer_for_duplicate_tablelayer(
 if __name__ == "__main__":
     hydamo_path = r"path\to\your\input\HyDAMO.gpkg"
     output_path = r"path\to\your\output\HyDAMO_duplicates.gpkg"
-    duplicate_pointlayer_for_duplicate_tablelayer(
+    output = duplicate_pointlayer_for_duplicate_tablelayer(
         hydamo_path,
         dst_gpkg_path=output_path,
-        pointlayer="gemaal",
-        tablelayer="pomp",
-        layerid="gemaalid",
+        pointlayer="stuw",
+        tablelayer="kunstwerkopening",
+        layerid="stuwid",
     )
+
+    print(f"Output GeoPackage: {output['output_gpkg']}")
+    print(f"Number of duplicates created: {output['duplicates_created']}")
