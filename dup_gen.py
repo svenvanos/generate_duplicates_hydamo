@@ -44,10 +44,10 @@ def duplicate_pointlayer_for_duplicate_tablelayer(
     table_groups = updated_table.groupby(layerid).apply(lambda df: df.index.tolist())
     duplicates_to_process = {k: v for k, v in table_groups.items() if len(v) > 1}
 
-    new_gemaal_rows = []
+    new_point_layer_rows = []
 
-    for original_gemaal_id, table_indices in duplicates_to_process.items():
-        orig = point_gdf[point_gdf["globalid"] == original_gemaal_id]
+    for original_point_layer_id, table_indices in duplicates_to_process.items():
+        orig = point_gdf[point_gdf["globalid"] == original_point_layer_id]
         if orig.empty:
             continue
         orig_row = orig.iloc[0]
@@ -55,20 +55,20 @@ def duplicate_pointlayer_for_duplicate_tablelayer(
         # First table keeps original layerid; others get copies
         for i, table_idx in enumerate(table_indices[1:], start=1):
             new_row = orig_row.copy()
-            new_globalid = f"{original_gemaal_id}_{i}"
+            new_globalid = f"{original_point_layer_id}_{i}"
             new_row["globalid"] = new_globalid
-            new_gemaal_rows.append(new_row)
+            new_point_layer_rows.append(new_row)
 
             updated_table.at[table_idx, layerid] = new_globalid
 
     # Build output point (GeoDataFrame)
-    if new_gemaal_rows:
-        new_gemaal_df = pd.DataFrame(new_gemaal_rows)
+    if new_point_layer_rows:
+        new_point_df = pd.DataFrame(new_point_layer_rows)
         geom_col = point_gdf.geometry.name
-        new_gemaal_gdf = gpd.GeoDataFrame(
-            new_gemaal_df, geometry=geom_col, crs=point_gdf.crs
+        new_point_gdf = gpd.GeoDataFrame(
+            new_point_df, geometry=geom_col, crs=point_gdf.crs
         )
-        point_out = pd.concat([point_gdf, new_gemaal_gdf], ignore_index=True)
+        point_out = pd.concat([point_gdf, new_point_gdf], ignore_index=True)
     else:
         point_out = point_gdf
 
@@ -103,7 +103,7 @@ def duplicate_pointlayer_for_duplicate_tablelayer(
 
     return {
         "output_gpkg": dst_gpkg_path,
-        "duplicates_created": len(new_gemaal_rows),
+        "duplicates_created": len(new_point_layer_rows),
     }
 
 
