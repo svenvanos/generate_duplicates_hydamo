@@ -1,1 +1,1 @@
-"# generate_duplicates_hydamo" 
+Generate duplicate points in a HyDAMO point layer to visualize objects from a table layer in the case there are multi-to-one connections between the table and point layer
