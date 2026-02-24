@@ -3,12 +3,13 @@ import pandas as pd
 import sqlite3
 from pathlib import Path
 
+
 def duplicate_pointlayer_for_duplicate_tablelayer(
     src_gpkg_path,
     dst_gpkg_path="hydamo_duplicates.gpkg",
     pointlayer="gemaal",
     tablelayer="pomp",
-    layerid='gemaalid',
+    layerid="gemaalid",
 ):
     """
     Duplicate point features in 'pointlayer' for each duplicate reference in 'tablelayer'.
@@ -32,7 +33,9 @@ def duplicate_pointlayer_for_duplicate_tablelayer(
     if "globalid" not in point_gdf.columns:
         raise ValueError("point layer must contain 'globalid' column.")
     if layerid not in table_df.columns:
-        raise ValueError(f"table layer must contain '{layerid}' column referencing point.globalid.")
+        raise ValueError(
+            f"table layer must contain '{layerid}' column referencing point.globalid."
+        )
 
     # Work on a copy
     updated_table = table_df.copy()
@@ -62,7 +65,9 @@ def duplicate_pointlayer_for_duplicate_tablelayer(
     if new_gemaal_rows:
         new_gemaal_df = pd.DataFrame(new_gemaal_rows)
         geom_col = point_gdf.geometry.name
-        new_gemaal_gdf = gpd.GeoDataFrame(new_gemaal_df, geometry=geom_col, crs=point_gdf.crs)
+        new_gemaal_gdf = gpd.GeoDataFrame(
+            new_gemaal_df, geometry=geom_col, crs=point_gdf.crs
+        )
         point_out = pd.concat([point_gdf, new_gemaal_gdf], ignore_index=True)
     else:
         point_out = point_gdf
@@ -102,9 +107,13 @@ def duplicate_pointlayer_for_duplicate_tablelayer(
     }
 
 
-
 if __name__ == "__main__":
     hydamo_path = r"path\to\your\input\HyDAMO.gpkg"
     output_path = r"path\to\your\output\HyDAMO_duplicates.gpkg"
-    duplicate_pointlayer_for_duplicate_tablelayer(hydamo_path, dst_gpkg_path=output_path)
-
+    duplicate_pointlayer_for_duplicate_tablelayer(
+        hydamo_path,
+        dst_gpkg_path=output_path,
+        pointlayer="gemaal",
+        tablelayer="pomp",
+        layerid="gemaalid",
+    )
